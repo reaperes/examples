@@ -17,7 +17,7 @@
   // d3 chart example
   // https://github.com/reaperes/examples/blob/master/d3/index.html
 
-  var object = {
+  const object = {
     result: 0,
     sentence: ' glue the sheet to the dark blue background <sil>',
     stress: ['Glue', 'the', 'sheet', 'to', 'the', 'dark', 'blue', '\u02caack\u02cbround'],
@@ -33,14 +33,19 @@
     criWords: ',0,0,0,0,0,0,0,0'
   };
 
-  ////////////////////////////////////////////////////////////
-  //startPoint 받아와 배열에 담기
-  var startTemp = object.startPoint.split(' ');
-  var startPoint = new Array(startTemp.length - 1);
+  function getStartPointsFromObject() {
+    var startTemp = object.startPoint.split(' ');
+    var startPoint = new Array(startTemp.length - 1);
 
-  for (var i = 1; i < startTemp.length; i++) {
-    startPoint[i - 1] = parseFloat(startTemp[i]);
+    for (var i = 1; i < startTemp.length; i++) {
+      startPoint[i - 1] = parseFloat(startTemp[i]);
+    }
+
+    return startPoint;
   }
+
+  const startPoints = getStartPointsFromObject();
+
   ///////////////////////////////////////////////////////////
   //endPoint 받아와 배열에 담기
   var endTemp = object.endPoint.split(' ');
@@ -51,7 +56,7 @@
   }
   //////////////////////////////////////////////////////////
   //startPoint endPoint 배열 합치기
-  var startEndPoint = startPoint.concat(endPoint);
+  var startEndPoint = startPoints.concat(endPoint);
 
   //합친 배열에서 중복 제거하기
   var startEndUniq = startEndPoint.slice() // 정렬하기 전에 복사본을 만든다.
