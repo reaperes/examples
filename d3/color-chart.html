@@ -41,17 +41,24 @@
 
   const startPoints = getStartPointsFromObject();
 
+  function getEndPointsFromObject() {
+    const endTemp = object.endPoint.split(' ');
+    const endPoint = new Array(endTemp.length - 1);
+
+    for (var i = 1; i < endTemp.length; i++) {
+      endPoint[i - 1] = parseFloat(endTemp[i]);
+    }
+
+    return endPoint;
+  }
+
+  const endPoints = getEndPointsFromObject();
+
   ///////////////////////////////////////////////////////////
   //endPoint 받아와 배열에 담기
-  var endTemp = object.endPoint.split(' ');
-  var endPoint = new Array(endTemp.length - 1);
-
-  for (var i = 1; i < endTemp.length; i++) {
-    endPoint[i - 1] = parseFloat(endTemp[i]);
-  }
   //////////////////////////////////////////////////////////
   //startPoint endPoint 배열 합치기
-  var startEndPoint = startPoints.concat(endPoint);
+  var startEndPoint = startPoints.concat(endPoints);
 
   //합친 배열에서 중복 제거하기
   var startEndUniq = startEndPoint.slice() // 정렬하기 전에 복사본을 만든다.
