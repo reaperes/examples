@@ -41,15 +41,10 @@
 
   const startPoints = getArrayFromRawDataString(object.startPoint);
   const endPoints = getArrayFromRawDataString(object.endPoint);
-
-  ///////////////////////////////////////////////////////////
-  //endPoint 받아와 배열에 담기
-  //////////////////////////////////////////////////////////
-  //startPoint endPoint 배열 합치기
-  var startEndPoint = startPoints.concat(endPoints);
+  const startEndPoints = startPoints.concat(endPoints);
 
   //합친 배열에서 중복 제거하기
-  var startEndUniq = startEndPoint.slice() // 정렬하기 전에 복사본을 만든다.
+  var startEndUniq = startEndPoints.slice() // 정렬하기 전에 복사본을 만든다.
     .sort(function (a, b) {
       return a - b;
     })
@@ -114,7 +109,7 @@
 
   partInto[i] = intonations[i];
 
-  if (i == startEndPoint[j]) {
+  if (i == startEndPoints[j]) {
     svg.append('path')
       .datum(partInto)
       .attr('d', cardinalCurveLine)
