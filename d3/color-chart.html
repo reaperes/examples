@@ -8,6 +8,10 @@
       padding: 50px;
       overflow-y: hidden;
     }
+
+    svg line {
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -34,6 +38,14 @@
     criWords: ',0,0,0,0,0,0,0,0'
   };
 
+  function createGroupedArray(arr, chunkSize) {
+    const groups = [];
+    for (let i = 0; i < arr.length; i += chunkSize) {
+      groups.push(arr.slice(i, i + chunkSize));
+    }
+    return groups;
+  }
+
   function getArrayFromRawDataString(dataString) {
     const result = dataString.split(' ');
     result.shift();
@@ -45,92 +57,41 @@
   const startEndPoints = startPoints.concat(endPoints);
   const startEndUniqPoints = _.uniq(startEndPoints);
 
-  var intonations = object.intonation.split('|').map(Number);
-  var minIntonation = d3.min(intonations);
-  var maxIntonation = d3.max(intonations);
+  const intonations = object.intonation.split('|').map(Number);
+  const intonationChunks = createGroupedArray(intonations, 50);
+  const minIntonation = d3.min(intonations);
+  const maxIntonation = d3.max(intonations);
+  const svgWidth = window.innerWidth - 600;
+  const svgHeight = window.innerHeight - 300;
 
-
-  var svgWidth = window.innerWidth - 1000;
-  var svgHeight = window.innerHeight - 500;
-
-
-  var xLinearScale = d3.scaleLinear()
+  const xLinearScale = d3.scaleLinear()
     .domain([0, intonations.length])
     .range([0, svgWidth]);
 
-
-  var yLinearScale = d3.scaleLinear()
+  const yLinearScale = d3.scaleLinear()
     .domain([minIntonation, maxIntonation])
     .range([svgHeight, 0]);
 
-
-  var svg = d3.select('.cardinal-curve')
+  const svg = d3.select('.cardinal-curve')
     .append('svg')
     .attr('width', svgWidth)
-    .attr('height', svgHeight);
+    .attr('height', svgHeight)
+    .attr('viewBox', '0 0 ' + svgWidth + ' ' + svgHeight);
 
+  intonations.forEach((intonation, idx) => {
+    if (idx === intonations.length - 1) {
+      return;
+    }
 
-  var cardinalCurveLine = d3.line()
-    .x((v, idx) => xLinearScale(idx))
-    .y(v => yLinearScale(v))
-    .curve(d3.curveCatmullRomOpen);  // https://github.com/d3/d3-shape/blob/master/README.md#curves
-
-
-  var j = 0;
-  var partInto = [];
-
-  /* 	for(var i=0; i< intonations.length; i++){
-
-
-   svg.append('path')
-   .datum(intonations)
-   .attr('d', cardinalCurveLine)
-   .attr('fill', 'none')
-   .attr('stroke', function(){
-   if(intonations[i] > 40 ){
-   return 'red';
-   }else{
-   return 'blue';
-   }
-   });
-   } */
-
-  //for(var i=0; i <= intonations.length; i++){
-
-  partInto[i] = intonations[i];
-
-  if (i == startEndPoints[j]) {
-    svg.append('path')
-      .datum(partInto)
-      .attr('d', cardinalCurveLine)
+    const color = idx % 8 < 4 ? 'red' : 'blue';
+    svg.append('line')
+      .attr('x1', xLinearScale(idx))
+      .attr('x2', xLinearScale(idx+1))
+      .attr('y1', yLinearScale(intonation))
+      .attr('y2', yLinearScale(intonations[idx+1]))
       .attr('fill', 'none')
-      .attr('stroke', function () {
-        switch (j % 2) {
-          case 1:
-            return 'red';
-          case 2:
-            return 'blue';
-        }
-      });
-
-    j++;
-    partInto = [];
-  }
-
-  //}
-
-
-  /* svg.append('path')
-   .datum(intonations)
-   .attr('d', cardinalCurveLine)
-   .attr('fill', 'none')
-   .attr('stroke', function(){
-   if(intonations[i] > 40 ){
-   return 'red';
-   }else{
-   return 'blue';
-   }
-   }); */
+      .attr('stroke', color);
+  });
 
 </script>
 </body>
