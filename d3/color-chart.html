@@ -34,14 +34,9 @@
   };
 
   function getStartPointsFromObject() {
-    var startTemp = object.startPoint.split(' ');
-    var startPoint = new Array(startTemp.length - 1);
-
-    for (var i = 1; i < startTemp.length; i++) {
-      startPoint[i - 1] = parseFloat(startTemp[i]);
-    }
-
-    return startPoint;
+    const startPoints = object.startPoint.split(' ');
+    startPoints.shift();
+    return startPoints.map(Number);
   }
 
   const startPoints = getStartPointsFromObject();
