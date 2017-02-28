@@ -33,26 +33,14 @@
     criWords: ',0,0,0,0,0,0,0,0'
   };
 
-  function getStartPointsFromObject() {
-    const startPoints = object.startPoint.split(' ');
-    startPoints.shift();
-    return startPoints.map(Number);
+  function getArrayFromRawDataString(dataString) {
+    const result = dataString.split(' ');
+    result.shift();
+    return result.map(Number);
   }
 
-  const startPoints = getStartPointsFromObject();
-
-  function getEndPointsFromObject() {
-    const endTemp = object.endPoint.split(' ');
-    const endPoint = new Array(endTemp.length - 1);
-
-    for (var i = 1; i < endTemp.length; i++) {
-      endPoint[i - 1] = parseFloat(endTemp[i]);
-    }
-
-    return endPoint;
-  }
-
-  const endPoints = getEndPointsFromObject();
+  const startPoints = getArrayFromRawDataString(object.startPoint);
+  const endPoints = getArrayFromRawDataString(object.endPoint);
 
   ///////////////////////////////////////////////////////////
   //endPoint 받아와 배열에 담기
