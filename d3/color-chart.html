@@ -13,6 +13,7 @@
 <body>
 <div class="cardinal-curve"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.6.0/d3.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
 <script>
   // d3 chart example
   // https://github.com/reaperes/examples/blob/master/d3/index.html
@@ -42,18 +43,7 @@
   const startPoints = getArrayFromRawDataString(object.startPoint);
   const endPoints = getArrayFromRawDataString(object.endPoint);
   const startEndPoints = startPoints.concat(endPoints);
-
-  //합친 배열에서 중복 제거하기
-  var startEndUniq = startEndPoints.slice() // 정렬하기 전에 복사본을 만든다.
-    .sort(function (a, b) {
-      return a - b;
-    })
-    .reduce(function (a, b) {
-      if (a.slice(-1)[0] !== b) a.push(b); // slice(-1)[0] 을 통해 마지막 아이템을 가져온다.
-      return a;
-    }, []); //a가 시작될 때를 위한 비어있는 배열
-  ///////////////////////////////////////////////////////
-
+  const startEndUniqPoints = _.uniq(startEndPoints);
 
   var intonations = object.intonation.split('|').map(Number);
   var minIntonation = d3.min(intonations);
