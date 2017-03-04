@@ -4,11 +4,18 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "http-server"
+    "start": "cross-env FB_APP_ID=1562878003730254 FB_APP_SECRET=be1326e435fc5318dfc0fa8506bdfe5c node client-with-server/server.js"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "http-server": "^0.9.0"
+    "cross-env": "^3.1.4"
+  },
+  "dependencies": {
+    "express": "^4.14.1",
+    "passport": "^0.3.2",
+    "passport-facebook": "^2.1.1",
+    "querystring": "^0.2.0",
+    "request": "^2.80.0"
   }
 }
