@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Spring boot oauth2 facebook</title>
+  <link rel="icon" href="data:;base64,iVBORw0KGgo="/>
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.css"/>
+  <style>
+    body {
+      padding: 10px;
+    }
+
+    header {
+      padding: 0 4px;
+      margin-bottom: 14px;
+    }
+
+    header > h1 {
+      margin: auto;
+      text-align: center;
+    }
+
+    main {
+      width: calc(100% - 40px);
+      max-width: 400px;
+      margin: auto;
+      padding: 20px;
+      border-radius: 4px;
+      text-align: center;
+      background: rgba(218,237,189,.6);
+    }
+
+    #status-container {
+      margin-bottom: 20px;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    #status-container:hover {
+      background: rgb(218,237,189);
+      font-weight: 600;
+    }
+
+    main button {
+      margin: 0 8px;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Facebook oauth2 sample with Spring boot</h1>
+</header>
+<main>
+  <div id="status-container">
+    <div>Facebook status ===> <span id="status">click to refresh</span></div>
+  </div>
+  <div>
+    <button id="log-in">Log in</button>
+    <button id="log-out">Log out</button>
+  </div>
+</main>
+<script>
+  window.fbAsyncInit = function () {
+    FB.init({
+      appId: '1562878003730254',
+      xfbml: true,
+      version: 'v2.8'
+    });
+    FB.AppEvents.logPageView();
+  };
+
+  (function (d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) {
+      return;
+    }
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+  $(window).on('load', () => {
+    FB.Event.subscribe('auth.statusChange', (res) => $('#status').text(res.status));
+    $('#status-container').click(() => FB.getLoginStatus(res => $('#status').text(res.status)));
+    $('#log-in').click(() => FB.login());
+    $('#log-out').click(() => FB.logout());
+  });
+</script>
+</body>
+</html>
