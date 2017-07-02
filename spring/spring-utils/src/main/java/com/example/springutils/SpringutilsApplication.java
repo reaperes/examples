@@ -5,26 +5,38 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.FileCopyUtils;
-import org.springframework.util.SystemPropertyUtils;
+import org.springframework.core.ResolvableType;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+import org.springframework.util.*;
+import org.springframework.web.bind.ServletRequestUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.support.RequestContextUtils;
+import org.springframework.web.util.WebUtils;
 
+import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.FileReader;
 import java.io.Reader;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Executable;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 @SpringBootApplication
 public class SpringutilsApplication {
@@ -48,7 +60,33 @@ public class SpringutilsApplication {
       classUtils();
       systemPropertyUtils();
       fileCopyUtils();
+      web();
+      aop(demo);
+      reflection();
     };
+  }
+
+  private void reflection() {
+    ReflectionUtils.doWithFields(DemoClass.class, field -> log.info("field = " + field.toString()));
+    ReflectionUtils.doWithMethods(DemoClass.class, method -> log.info("method = " + method.toString()));
+
+    Field list = ReflectionUtils.findField(DemoClass.class, "list");
+    log.info(list.toString());
+
+    ResolvableType rt = ResolvableType.forField(list);
+    log.info(rt.toString());
+  }
+
+  private void aop(DemoClass demoClass) {
+    Class<?> targetClass = AopUtils.getTargetClass(demoClass);
+    log.info("Class<?> is " + targetClass);
+    log.info("is AOP proxy? " + AopUtils.isAopProxy(demoClass));
+    log.info("is CGlib proxy? " + AopUtils.isCglibProxy(demoClass));
+  }
+
+  private void web() {
+    RestTemplate rt = new RestTemplate();
+    rt.getForEntity("http://localhost:8080/hi", Void.class);
   }
 
   private void fileCopyUtils() {
@@ -81,14 +119,47 @@ public class SpringutilsApplication {
     PropertyDescriptor[] descriptors = BeanUtils.getPropertyDescriptors(demo.getClass());
     for (PropertyDescriptor pd : descriptors) {
       log.info("pd: " + pd.getName());
-      log.info("pd.readMethod: " + pd.getReadMethod().getName());
+      // log.info("pd.readMethod: " + pd.getReadMethod().getName());    // disabled by proxy
     }
   }
+
+  @RestController
+  public static class SimpleRestController {
+    @GetMapping("/hi")
+    void hi(HttpServletRequest request) {
+      long age = ServletRequestUtils.getIntParameter(request, "age", -1);
+      log.info("age is " + age);
+
+      File tempDir = WebUtils.getTempDir(request.getServletContext());
+      log.info("temporary directory for Apache Tomcat is " + tempDir.getAbsolutePath());
+
+      WebApplicationContext webApplicationContext = RequestContextUtils.findWebApplicationContext(request);
+      Environment bean = webApplicationContext.getBean(Environment.class);
+      log.info("webApplicationContext resolved property = " + bean.getProperty("user.home"));
+    }
+  }
+
+  @Aspect
+  @Component
+  public static class SimpleBeforeAspect {
+    @Before("execution(* begin(..))")
+    public void before(JoinPoint joinPoint) {
+      log.info("before()");
+      log.info("signature: " + joinPoint.toString());
+    }
+  }
+
 
   @Data
   @AllArgsConstructor
   @NoArgsConstructor
   public static class DemoClass {
+
     private List<Map<String, Object>> list = new ArrayList<>();
+
+    @PostConstruct
+    public void begin() {
+      log.info("begin()");
+    }
   }
 }
